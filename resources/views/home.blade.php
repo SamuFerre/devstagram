@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('titulo')
-    Pagina Principal
+    Devstagram
 @endsection
 
 @section('contenido')
-    contenido de la pagina
+  <x-listar-post :posts="$posts" />
 @endsection

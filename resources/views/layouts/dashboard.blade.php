@@ -32,12 +32,14 @@
                 </div>
 
                 <p class="text-gray-800 text-sm mb-3 font-bold mt-5">
-                    0
-                    <span class="font-normal">Followers</span>
+                    {{$user->followers->count()}}
+                    <span class="font-normal">
+                        @choice('Follower|Followers', $user->followers->count())
+                    </span>
                 </p>
 
                 <p class="text-gray-800 text-sm mb-3 font-bold">
-                    0
+                    {{$user->following->count()}}
                     <span class="font-normal">Following</span>
                 </p>
 
@@ -47,14 +49,18 @@
                 </p>
                 @auth
                     @if($user->id !== auth()->user()->id )
-                        <form action="{{ route('users.follow', $user) }}" method="post">
-                            @csrf
-                            <input type="submit" class="bg-blue-600 text-white uppercase rounded-lg px-3 py-1 text-xs font-bold cursor-pointer" value="Follow"/>
-                        </form>
-                        <form action="" method="POST">
-                            @csrf
-                            <input type="submit" class="bg-red-600 text-white uppercase rounded-lg px-3 py-1 text-xs font-bold cursor-pointer" value="Unfollow"/>
-                        </form>
+                        @if (!$user->siguiendo(auth()->user()))
+                            <form action="{{ route('users.follow', $user) }}" method="post"> 
+                                @csrf
+                                <input type="submit" class="bg-blue-600 text-white uppercase rounded-lg px-3 py-1 text-xs font-bold cursor-pointer" value="Follow"/>
+                            </form>
+                        @else
+                            <form action="{{ route('users.unfollow', $user) }}" method="POST">
+                                @method('DELETE')
+                                @csrf
+                                <input type="submit" class="bg-red-600 text-white uppercase rounded-lg px-3 py-1 text-xs font-bold cursor-pointer" value="Unfollow"/>
+                            </form>
+                        @endif
                     @endif
                 @endauth
             </div>
@@ -65,25 +71,7 @@
         <h2 class="text-4xl text-center font-black my-10">
             Posts
         </h2>
-        @if ($posts->count())
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @foreach ($posts as $post)
-                <div>
-                    <a href="{{ route('posts.show', ['user' => $user, 'post' => $post])}}">
-                        <img src="{{ asset('uploads'). '/' . $post->imagen }}" alt="imagen del post {{ $post->titulo }}"/>
-                    </a>
-                </div>
-            @endforeach
-        </div>
-        <div class="my-10">
-            {{$posts->links()}}
-        </div>
-
-        @else
-            <p class="text-gray-600 uppercase text-sm text-center font-bold">There's no Posts yet</p>
-
-        @endif
+       <x-listar-post :posts="$posts"/>
     </section>
 
 
